@@ -11,11 +11,10 @@ import time
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine.url import URL
-from model import Domain,Ip,ParentDomain
+from model import Record,Ip,SldWhiteItem
 
 SETTINGS = get_settings(settings)
-db_url = URL(drivername='mysql+mysqldb', username=SETTINGS['DB_USER'], password=SETTINGS['DB_PASSWD'],
-        host=SETTINGS['DB_HOST'], port=SETTINGS['DB_PORT'], database=SETTINGS['DB_DB'])
+db_url = URL(drivername='mysql+mysqldb', username=SETTINGS['DB_USER'], password=SETTINGS['DB_PASSWD'], host=SETTINGS['DB_HOST'], port=SETTINGS['DB_PORT'], database=SETTINGS['DB_DB'])
 #  engine = create_engine(db_url)
 #  DBSession = sessionmaker(engine)
 #  session = DBSession()

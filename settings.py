@@ -8,10 +8,48 @@
 
 DB_HOST = '127.0.0.1'
 DB_PORT = 3306
-DB_USER = 'root'
-DB_PASSWD = ''
+DB_USER = 'evil'
+DB_PASSWD = 'evil^123456'
 
 DB_DB = 'passive_dns'
+
+#  Monitor folder settings
+WK_DIR = '../working'
+HST_DIR = '../history'
+DPC_DIR = '../deprecated'
+
+# logging settings
+LOG_PATH = '../log/ruku.log'
+LOG_CONF = {
+    'version': 1,
+    'formatters': {
+        'default': {'format': '%(asctime)s - %(levelname)s - %(message)s', 'datefmt': '%Y-%m-%d %H:%M:%S'}
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+            'stream': 'ext://sys.stdout'
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'default',
+            'filename': LOG_PATH,
+            #  'maxBytes': 1024,
+            'backupCount': 3
+        }
+    },
+    'loggers': {
+        'default': {
+            'level': 'DEBUG',
+            'handlers': ['console', 'file']
+        }
+    },
+    'disable_existing_loggers': False
+}
+
 
 URLTYPE_DICT = {0:u'未知', 1:u'未知', 2:u'危险网站', 3:u'安全', 4:u'安全', u'其他':u'未知'}
 EVILCLASS_DICT = {1:u'社工欺诈 （仿冒、账号钓鱼、中奖诈骗）',
