@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
 import os
 import datetime
 import pyinotify
@@ -63,14 +58,15 @@ class LogEventHandler(pyinotify.ProcessEvent):
         self.logger.info("UNMOUNT event : %s  %s" % (os.path.join(event.path,event.name),datetime.datetime.now()))
 
 def main():
+    logging.basicConfig(level=logging.DEBUG)
+
     # watch manager
     handler = LogEventHandler()
     wm = pyinotify.WatchManager()
     notifier = pyinotify.Notifier(wm, handler)
-    wm.add_watch('./tmp', pyinotify.ALL_EVENTS, rec=True)
+    wm.add_watch('../working', pyinotify.ALL_EVENTS, rec=True)
 
     notifier.loop()
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
     main()

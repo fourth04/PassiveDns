@@ -1,25 +1,28 @@
-# -*- coding: utf-8 -*-
+ENV = 'debug'
 
 #Database settings
-#  DB_HOST = '10.104.243.193'
-#  DB_PORT = 3306
-#  DB_USER = 'evil'
-#  DB_PASSWD = 'evil^123456'
+if ENV == 'debug':
+    DB_DRIVER = 'mysql+mysqldb'
+    DB_HOST = '127.0.0.1'
+    DB_PORT = 3306
+    DB_USER = 'evil'
+    DB_PASSWD = 'evil^123456'
+    DB_DB = 'passive_dns'
+elif ENV == 'local':
+    DB_DRIVER = 'mysql+mysqldb'
+    DB_HOST = '10.104.243.193'
+    DB_PORT = 3306
+    DB_USER = 'evil'
+    DB_PASSWD = 'evil^123456'
+    DB_DB = 'passive_dns'
 
-DB_HOST = '127.0.0.1'
-DB_PORT = 3306
-DB_USER = 'evil'
-DB_PASSWD = 'evil^123456'
-
-DB_DB = 'passive_dns'
 
 #  Monitor folder settings
-WK_DIR = '../working'
-HST_DIR = '../history'
-DPC_DIR = '../deprecated'
+WK_DIR = '/home/cyber/WorkSpace/working'
+HST_DIR = '/home/cyber/WorkSpace/history'
+DPC_DIR = '/home/cyber/WorkSpace/deprecated'
 
 # logging settings
-LOG_PATH = '../log/ruku.log'
 LOG_CONF = {
     'version': 1,
     'formatters': {
@@ -36,23 +39,88 @@ LOG_CONF = {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'default',
-            'filename': LOG_PATH,
-            #  'maxBytes': 1024,
+            'filename': '../log/default.log',
+            'maxBytes': 1024,
             'backupCount': 3
-        }
+        },
+        'file_importfromfile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'default',
+            'filename': '../log/importfromfile.log',
+            'maxBytes': 1024,
+            'backupCount': 3
+        },
+        'file_importfromdb': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'default',
+            'filename': '../log/importfromdb.log',
+            'maxBytes': 1024,
+            'backupCount': 3
+        },
+        'file_dnsresolve': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'default',
+            'filename': '../log/dnsresolve.log',
+            'maxBytes': 1024,
+            'backupCount': 3
+        },
+        'file_whoisresolve': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'default',
+            'filename': '../log/whoisresolve.log',
+            'maxBytes': 1024,
+            'backupCount': 3
+        },
+        'file_restserver': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'default',
+            'filename': '../log/restserver.log',
+            'maxBytes': 1024,
+            'backupCount': 3
+        },
     },
     'loggers': {
         'default': {
             'level': 'DEBUG',
             'handlers': ['console', 'file']
-        }
+        },
+        'api.watchdirectory': {
+            'level': 'DEBUG',
+            'handlers': ['console', 'file_importfromfile']
+        },
+        'api.importfromfile': {
+            'level': 'DEBUG',
+            'handlers': ['console', 'file_importfromfile']
+        },
+        'api.importfromdb': {
+            'level': 'DEBUG',
+            'handlers': ['console', 'file_importfromdb']
+        },
+        'api.dnsresolve': {
+            'level': 'DEBUG',
+            'handlers': ['console', 'file_dnsresolve']
+        },
+        'api.whoisresolve': {
+            'level': 'DEBUG',
+            'handlers': ['console', 'file_whoisresolve']
+        },
+        'api.restserver': {
+            'level': 'DEBUG',
+            'handlers': ['console', 'file_restserver']
+        },
     },
     'disable_existing_loggers': False
 }
 
 
-URLTYPE_DICT = {0:u'未知', 1:u'未知', 2:u'危险网站', 3:u'安全', 4:u'安全', u'其他':u'未知'}
-EVILCLASS_DICT = {1:u'社工欺诈 （仿冒、账号钓鱼、中奖诈骗）',
+URLTYPE_DICT = {0:u'未知', 1:u'未知', 2:u'危险网站', 3:u'安全', 4:u'安全', 99:u'未知'}
+EVILCLASS_DICT = {0:u'未知',
+                  1:u'社工欺诈 （仿冒、账号钓鱼、中奖诈骗）',
                   2:u'信息诈骗 （虚假充值、虚假兼职、虚假金融投资、虚假信用卡代办、网络赌博诈骗）',
                   3:u'虚假销售 （男女保健美容减肥产品、电子产品、虚假广告、违法销售）',
                   4:u'恶意文件 （病毒文件，木马文件，恶意apk文件的下载链接以及站点，挂马网站）',

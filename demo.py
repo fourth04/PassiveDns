@@ -1,64 +1,38 @@
-# -*- coding: utf-8 -*-
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
-from datetime import datetime
-from utils import get_settings
+from utils import get_settings, get_engine
 import settings
-import time
 
 from sqlalchemy import create_engine
+from sqlalchemy import select, and_, or_, func, text
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.engine.url import URL
-from model import Record,Ip,SldWhiteItem
+from model import *
 
 SETTINGS = get_settings(settings)
-db_url = URL(drivername='mysql+mysqldb', username=SETTINGS['DB_USER'], password=SETTINGS['DB_PASSWD'], host=SETTINGS['DB_HOST'], port=SETTINGS['DB_PORT'], database=SETTINGS['DB_DB'])
-#  engine = create_engine(db_url)
-#  DBSession = sessionmaker(engine)
-#  session = DBSession()
+engine = get_engine(SETTINGS)
+Session = sessionmaker(bind=engine)
+session = Session()
+#  from IPython import embed;embed()
+#  column = Record.id
+#  q = session.query(column, func.row_number().over(order_by=column).label('rownum')).from_self(column)
+#  record = Record.__table__
+#  windowsize = 100
+#  select_s = select([record.c.id, func.row_number().over(order_by=record.c.id)]).where(text("rownum %% %d=1" % windowsize))
 
-#  session.add(Domain(dname='www.qq.com', parse_count='100000', created_at=datetime.now(), updated_at=datetime.now()))
-#  session.query(Domain).first().ips = [Ip(ip='1.1.1.1', created_at=datetime.now(), updated_at=datetime.now()]
+#  dictionary = Dictionary.__table__
+#  insert_s = dictionary.insert().prefix_with('IGNORE')
+#  urltype_dict = SETTINGS['URLTYPE_DICT']
+#  insert_v1 = [{'category':'urltype', 'key':key, 'value':value }for key,value in urltype_dict.items()]
+#  evilclass_dict = SETTINGS['EVILCLASS_DICT']
+#  insert_v2 = [{'category':'evilclass', 'key':key, 'value':value }for key,value in evilclass_dict.items()]
+#  eviltype_dict = SETTINGS['EVILTYPE_DICT']
+#  insert_v3 = [{'category':'eviltype', 'key':key, 'value':value }for key,value in eviltype_dict.items()]
+#  engine.execute(insert_s, insert_v1)
+#  engine.execute(insert_s, insert_v2)
+#  engine.execute(insert_s, insert_v3)
 
-import json
-import pprint
-import requests
-import traceback
-from multiprocessing.dummy import Pool as ThreadPool
-
-def domain_report(domain):
-    url = "http://www.virustotal.com/vtapi/v2/domain/report"
-    parameters = {"domain": domain,
-                  "apikey": "164be93e854cf96810730375aebda0a0843e35400876392d73e056b0a570d06d"}
-    i = 1
-    while True:
-        try:
-            if i > 3:
-                return
-            r = requests.get(url, params=parameters)
-        except requests.exceptions.ConnectionError as e:
-            print e
-            print 'The %s attempt' % i
-            time.sleep(5)
-            i += 1
-    return json.loads(r.text)
-
-domains = ['10086dx.com.cn.w.kunlunno.com', 'byc.00810086.com', 'ccbgdhcs03.ccbgz.com', 'hxkmjbhozev.www.m3637.com']
-#  domains = ['www.baidu.com', 'www.10086.com', 'www.qq.com', 'www.bilibili.com', 'www.163.com'] * 3
-#  pool = ThreadPool(4)
-#  results = pool.map(domain_report, domains)
-#  pool.close()
-#  pool.join
-
-results = []
-for domain in domains:
-    print domain
-    results.append( domain_report(domain) )
-
-i = 0
-for tmp_d in results:
-    with open(str(i) + '.json', 'wb') as f:
-        json.dump(tmp_d, f, indent=4, ensure_ascii=False)
-    i += 1
+record = Record.__table__
+content = Content.__table__
+hlj = Hlj.__table__
+import pdb; pdb.set_trace()  # XXX BREAKPOINT
+#  select_s = select([record.c.dname, record.c.id]).select_from(record.join(hlj, record.c.dname==hlj.c.dname)).where(record.c.evilclass==5).order_by(hlj.c.parse_count.desc()).limit(1200)
