@@ -20,7 +20,7 @@ class MyEventHandler(LogEventHandler):
         super(MyEventHandler, self).__init__()
         self.settings = settings
         self.engine = engine
-        self.ptn_long = re.compile(r'\w{6,}\d\w{6,}')
+        self.ptn_long = re.compile(r"\w{6,}\d\w{6,}|'")
         self.df_sld_wl = pd.read_sql_table('t_sld_white_list', self.engine, index_col='id')
         #  self.df_sld_wl['dname'] = Series(['.']*len(self.df_sld_wl)).str.cat(self.df_sld_wl['dname'], sep='')
 
@@ -67,13 +67,6 @@ class MyEventHandler(LogEventHandler):
         if self.df_sld_wl['updated_at'].max() < last_update_time:
             self.df_sld_wl = pd.read_sql_table('t_sld_white_list', self.engine, index_col='id')
             #  self.df_sld_wl['dname'] = Series(['.']*len(self.df_sld_wl)).str.cat(self.df_sld_wl['dname'], sep='')
-
-    #  def _filter(self, s):
-        #  s = s[~s.str.contains(self.ptn_long)]
-        #  tmp_s = s.map(lambda x:'.'.join(x.split('.')[-2:]))
-        #  s = s[~tmp_s.isin(self.df_sld_wl['dname'])]
-        #  s = s[s.notnull()]
-        #  return s
 
     def _filter(self, df):
         df = df[~df[0].str.contains(self.ptn_long)]

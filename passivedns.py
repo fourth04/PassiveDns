@@ -2,10 +2,17 @@ from multiprocessing import Process
 import logging
 import logging.config
 import time
+import os
+import signal
+
 
 from utils import get_settings, get_engine
 import settings
 from api import *
+
+def term(sig_num, addtion):
+    print('current pid is %s, group id is %s' % (os.getpid(), os.getpgrp()))
+    os.killpg(os.getpgid(os.getpid()), signal.SIGKILL)
 
 def main():
     SETTINGS = get_settings(settings)
@@ -16,22 +23,23 @@ def main():
     ps = []
     for f in (dnsresolve.run, whoisresolve.run, importfromdb.run, restserver.run):
         name = f.__module__+'.'+f.__name__
-        p = Process(target=f, args=(engine,), name=name)
+        p = Process(target=f, args=(engine,), daemon=True, name=name)
         logger.info('Run function {}'.format(name))
         ps.append(p)
-        p.start()
-    p = Process(target=importfromfile.run, args=(SETTINGS, engine,), name=f.__module__+'.'+f.__name__)
+    p = Process(target=importfromfile.run, args=(SETTINGS, engine,), daemon=True, name='importfromfile.run')
     logger.info('Run function {}'.format(p.name))
     ps.append(p)
-    p.start()
-    while True:
-        not_alive_ps = [tmp_p for tmp_p in ps if not p.is_alive]
-        for p in not_alive_ps:
-            logger.error('{} occured error, trying to reboot it'.format(p.name))
-            p.run()
-        time.sleep(60*5)
     for p in ps:
-        p.join()
+        p.daemon = True
+        p.start()
+    signal.signal(signal.SIGTERM, term)
+    while True:
+        for i, p in enumerate(ps):
+            if not p.is_alive():
+                logger.error('{} occured error, trying to reboot it'.format(p.name))
+                ps[i] = Process(target=p._target, args=p._args, daemon=p.daemon, name=p._name)
+                ps[i].start()
+        time.sleep(60*5)
 
     #  can't pickle _thread.lock objects，怀疑与sqlalchemy的pool是用线程建立的有关系
     #  from multiprocessing import Pool

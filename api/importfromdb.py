@@ -23,7 +23,9 @@ def run(engine):
     while True:
         try:
             remote_last_dname = engine.execute(s).fetchone()[0]
-            remote_last_id = engine_remote.execute(text('select id from t_result where dname = :dname'), {'dname':remote_last_dname}).fetchone()[0] if remote_last_dname else 0
+            remote_last_id = engine_remote.execute(text('select id from t_result where dname = :dname'), {'dname':remote_last_dname}).scalar() if remote_last_dname else 0
+            if not remote_last_id:
+                remote_last_id = 0
             result_proxy = engine_remote.execute(text('select dname from t_result where id > :id limit 5000'), {'id':remote_last_id})
             if result_proxy.rowcount > 0:
                 logger.info('Select %s data from remote_database' % result_proxy.rowcount)
@@ -33,7 +35,7 @@ def run(engine):
                     logger.info('Insert %s records to local_database' % insert_r.rowcount)
             else:
                 logger.info('No data are waiting to resolve, ready to sleep')
-                time.sleep(60*5)
+                time.sleep(60*30)
         except Exception as e:
             logger.error(e)
 
